@@ -1,0 +1,23 @@
+application: simpletwitterupdate
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /css
+  static_dir: css
+- url: /images
+  static_dir: images
+- url: /video
+  static_dir: video
+
+- url: /(.*\.(gif|png|jpg|js))
+  static_files: images/\1
+  upload: images/(.*\.(gif|png|jpg|js))
+
+- url: /(.*\.(flv|wmv|avi|mp4|mov))
+  static_files: video/\1
+  upload: video/(.*\.(flv|wmv|avi|mp4|mov))
+
+- url: /.*
+  script: index.py
