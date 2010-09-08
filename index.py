@@ -11,18 +11,36 @@ import base64
 
 import os
 from google.appengine.ext.webapp import template
-#\lib\django\django\template
 
 from zd_db import *
 
+import datetime
+from google.appengine.ext import db
 
 class MainPage(webapp.RequestHandler):
   def get(self):
     user = users.get_current_user()
     if user:
       header(self,"Twitter更新")
+      
+      msgs=[]
+      query = db.GqlQuery("SELECT * FROM TwtMsg ORDER BY __key__ DESC")
+      results = query.fetch(10)
+      for result in results:
+        msgs.append({
+	  'msg': result.msg.encode('utf-8'),
+	  'date': result.date,
+	  #'id': result.__key__,
+	})
+
+      #q = db.GqlQuery("SELECT __key__ FROM TwtMsg")
+      #results = q.fetch(10)
+      #db.delete(results)
+
       template_values = {
             'nickname': user.nickname(),
+	    'msgs': msgs,
+	    'logout_url' : users.create_logout_url(self.request.uri)
       }
 
       path = os.path.join(os.path.dirname(__file__), 'index.html')
@@ -31,7 +49,61 @@ class MainPage(webapp.RequestHandler):
       footer(self)
 
     else:
-      self.redirect(users.create_login_url(self.request.uri))
+      #self.redirect(users.create_login_url(self.request.uri))
+      header(self,"登录")
+      template_values = {
+            'login_url' : self.request.uri
+      }
+
+      path = os.path.join(os.path.dirname(__file__), 'login.html')
+      self.response.out.write(template.render(path, template_values))
+      footer(self)
+
+class SaveTWT(webapp.RequestHandler):
+  def post(self):
+    sys_err = 0
+    err_msg = ""
+    form = cgi.FieldStorage()
+    if len(form["content2"].value) < 3 or len(form["content2"].value) > 130:
+      err_msg += "Messages必须是3-130个字符.<br>"
+      sys_err=1
+
+    if sys_err == 0:
+      mymsg = form["content2"].value
+      #db.Text(open(mymsg).read(), "utf-8")
+
+      query = TwtMsg.all()
+      query = db.GqlQuery("SELECT * FROM TwtMsg WHERE msg = :msg ", msg=unicode(mymsg,'utf-8'))
+      results = query.fetch(1)
+      if query.get():
+        header(self,"内容存在")
+        self.response.out.write('<h1>保存失败：内容已经存在</h1>')
+        self.response.out.write('<font color=green>'+mymsg+'['+str(len(results))+']</font>')
+        self.response.out.write('<p><a href="/">Back</a></p>')
+        footer(self)
+      else:
+        
+        e = TwtMsg(msg='')
+        e.msg=unicode(mymsg,'utf-8')
+        e.date = datetime.datetime.now().date()
+        e.put()
+
+        header(self,"保存内容")
+        self.response.out.write('<h1>保存成功</h1>')
+        self.response.out.write('<font color=green>'+mymsg+'</font>')
+        self.response.out.write('<p><a href="/">Back</a></p>')
+        footer(self)
+    
+    else:
+      header(self,"出错")
+      self.response.out.write('<h1>Error</h1>')
+      self.response.out.write('<font color=red>'+err_msg+'</font>')
+      footer(self)
+	
+class TwtMsg(db.Model):
+      msg = db.StringProperty()
+      date = db.DateProperty()
+        
 
 class UpdateTWT(webapp.RequestHandler):
   def post(self):
@@ -94,7 +166,8 @@ class UpdateTWT(webapp.RequestHandler):
 
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
-                                      ('/update', UpdateTWT)],
+                                      ('/update', UpdateTWT),
+				      ('/save', SaveTWT)],
                                      debug=True)
 
 def main():

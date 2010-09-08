@@ -1,11 +1,19 @@
-<img src="/images/88e082938947ff54d2a4ba8d6425c48027444754.gif">
+<div id="list_form">
+<img src="/images/88e082938947ff54d2a4ba8d6425c48027444754.gif"><br>
 Notice: Twitter has closed basic auth login, you can't login with this test code now. OAuth login will be the next update. 
-<h1>Twitter Update</h1><h3>你好, {{ nickname }}</h3>
-
+<h1>Twitter Update</h1><div class="inline"><a href="{{ logout_url }}">sign out</a></div>
+<h3>你好, {{ nickname }} </h3>
           <form action="/update" method="post">
             <div>UserID: <input name="id" type="text" value=""></div>
             <div>Passwd: <input name="passwd" type="password" value=""></div>
-            <div>Message: <br><textarea name="content" rows="3" cols="60"></textarea></div>
-            <div><input type="submit" value="提交"></div>
+            <div>Message: <br><textarea id="msg1" name="content" rows="3" cols="60"></textarea></div>
+            <div><input type="submit" value="提交"></form> <form class="inline" action="/save" method="post" onsubmit="document.getElementById('msg2').value=document.getElementById('msg1').value;return true;"><input type="submit" name="save" value="保存不提交"><input id="msg2" name="content2" type="hidden" value=""></div>
           </form>
+</div>
+<div id="list_msg">
+{% for item in msgs %}
+<p>{{ item.msg|escape }} - {{ item.date }}</p>
+{% endfor %}
 
+
+</div>

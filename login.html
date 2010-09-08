@@ -1,0 +1,19 @@
+
+<div id="list_form"><form method='get' action='/_ah/login'>
+
+    <h3>Login</h3>
+    <p >
+      <label for='email'>Email:</label>
+
+      <input name='email' type='text' value='test@example.com' id='email'/>
+    </p>
+    <p >
+      <input name='action' value='Continue...' type='submit' id='submit-login' />
+    </p>
+  </div>
+  <input name='continue' type='hidden' value='{{ login_url }}'/>
+  <input name='admin' type='hidden' value='True' />
+
+</form>
+
+</div>
