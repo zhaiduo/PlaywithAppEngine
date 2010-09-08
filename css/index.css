@@ -2,3 +2,6 @@
   font-family: Verdana, Helvetica, sans-serif;
   background-color: #DDDDDD;
 }
+.inline{display:inline;}
+#list_form{background-color:#efefef;border:1px #ccc solid;padding:12px;float:left;width:600px;}
+#list_msg{background-color:#efefef;border:1px #ccc solid;float:left;width:400px;padding:5px;text-align:left;margin-left:4px;}
