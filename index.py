@@ -17,6 +17,30 @@ from zd_db import *
 import datetime
 from google.appengine.ext import db
 
+class ClearMsg(webapp.RequestHandler):
+   def post(self):
+     form = cgi.FieldStorage()
+     if str(form["clear"].value) == "1":
+       q = db.GqlQuery("SELECT __key__ FROM TwtMsg")
+       results = q.fetch(500)
+       if results:
+         db.delete(results)
+       self.response.out.write('Ok')
+     else:
+       self.response.out.write('Err')
+
+class DelMsg(webapp.RequestHandler):
+   def get(self):
+     form = cgi.FieldStorage()
+     if int(form["id"].value) > 0:
+       query = db.GqlQuery("SELECT * FROM TwtMsg WHERE id = :id ", id=int(form["id"].value))
+       results = query.fetch(1)
+       if results:
+         db.delete(results)
+       self.response.out.write('Ok')
+     else:
+       self.response.out.write('Err')
+
 class LoginTWT(webapp.RequestHandler):
   def get(self):
     user = users.get_current_user()
@@ -40,11 +64,8 @@ class MainPage(webapp.RequestHandler):
         msgs.append({
 	  'msg': result.msg.encode('utf-8'),
 	  'date': result.date,
+	  'id': result.id,
 	})
-
-      #q = db.GqlQuery("SELECT __key__ FROM TwtMsg")
-      #results = q.fetch(10)
-      #db.delete(results)
 
       template_values = {
             'nickname': user.nickname(),
@@ -58,7 +79,6 @@ class MainPage(webapp.RequestHandler):
       footer(self)
 
     else:
-      #self.redirect(users.create_login_url(self.request.uri))
       header(self,"登录")
       template_values = {
             'login_url' : self.request.uri
@@ -90,10 +110,15 @@ class SaveTWT(webapp.RequestHandler):
         self.response.out.write('<p><a href="/">Back</a></p>')
         footer(self)
       else:
-        
         e = TwtMsg(msg='')
+        query = db.GqlQuery("SELECT * FROM TwtMsg ORDER BY __key__ DESC")
+        results = query.fetch(1)
+        if query.get():
+          e.id=query.get().id+1
+	else:
+	  e.id=1
         e.msg=unicode(mymsg,'utf-8')
-        e.date = datetime.datetime.now().date()
+        #e.date = datetime.datetime.now().date()
         e.put()
 
         header(self,"保存内容")
@@ -109,8 +134,9 @@ class SaveTWT(webapp.RequestHandler):
       footer(self)
 	
 class TwtMsg(db.Model):
+      id = db.IntegerProperty()
       msg = db.StringProperty()
-      date = db.DateProperty()
+      date = db.DateTimeProperty(None, True)
         
 
 class UpdateTWT(webapp.RequestHandler):
@@ -176,6 +202,8 @@ application = webapp.WSGIApplication(
                                      [('/', MainPage),
 				      ('/login', LoginTWT),
                                       ('/update', UpdateTWT),
+				      ('/ajax_delall', ClearMsg),
+				      ('/ajax_delete', DelMsg),
 				      ('/save', SaveTWT)],
                                      debug=True)
 

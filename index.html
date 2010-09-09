@@ -4,15 +4,15 @@ Notice: Twitter has closed basic auth login, you can't login with this test code
 <h1>Twitter Update</h1><div class="inline"><a href="{{ logout_url }}">sign out</a></div>
 <h3>你好, {{ nickname }} </h3>
           <form action="/update" method="post">
-            <div>UserID: <input name="id" type="text" value=""></div>
+            <div>UserID: <input name="id" type="text" value="{{ nickname }}"></div>
             <div>Passwd: <input name="passwd" type="password" value=""></div>
             <div>Message: <br><textarea id="msg1" name="content" rows="3" cols="60"></textarea></div>
             <div><input type="submit" value="提交"></form> <form class="inline" action="/save" method="post" onsubmit="document.getElementById('msg2').value=document.getElementById('msg1').value;return true;"><input type="submit" name="save" value="保存不提交"><input id="msg2" name="content2" type="hidden" value=""></div>
           </form>
 </div>
-<div id="list_msg">
+<div id="list_msg"><div id="list_action"><a id="clear_all" href="javascript:void(0);">clear all</a></div>
 {% for item in msgs %}
-<p>{{ item.msg|escape }} - {{ item.date }}</p>
+<p class="entry" id="entry_{{ item.id }}">[{{ item.id }}]<a class="msg" href="javascript:void(0);" id="sn_{{ item.id }}">{{ item.msg|escape }}</a><br><span class="small">{{ item.date }}</span> <a href="javascript:void(0);" class="del" id="del_{{ item.id }}" title="delete">[x]</a></p>
 {% endfor %}
 
 
