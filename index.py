@@ -17,6 +17,16 @@ from zd_db import *
 import datetime
 from google.appengine.ext import db
 
+class LoginTWT(webapp.RequestHandler):
+  def get(self):
+    user = users.get_current_user()
+    if user:
+      self.redirect("/")
+    else:
+      self.redirect(users.create_login_url(self.request.uri))
+  def post(self):
+    self.redirect(users.create_login_url(self.request.uri))
+
 class MainPage(webapp.RequestHandler):
   def get(self):
     user = users.get_current_user()
@@ -30,7 +40,6 @@ class MainPage(webapp.RequestHandler):
         msgs.append({
 	  'msg': result.msg.encode('utf-8'),
 	  'date': result.date,
-	  #'id': result.__key__,
 	})
 
       #q = db.GqlQuery("SELECT __key__ FROM TwtMsg")
@@ -70,7 +79,6 @@ class SaveTWT(webapp.RequestHandler):
 
     if sys_err == 0:
       mymsg = form["content2"].value
-      #db.Text(open(mymsg).read(), "utf-8")
 
       query = TwtMsg.all()
       query = db.GqlQuery("SELECT * FROM TwtMsg WHERE msg = :msg ", msg=unicode(mymsg,'utf-8'))
@@ -166,6 +174,7 @@ class UpdateTWT(webapp.RequestHandler):
 
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
+				      ('/login', LoginTWT),
                                       ('/update', UpdateTWT),
 				      ('/save', SaveTWT)],
                                      debug=True)
