@@ -1,7 +1,7 @@
 <div id="list_form">
-<img src="/images/88e082938947ff54d2a4ba8d6425c48027444754.gif"><br>
+<img src="/images/88e082938947ff54d2a4ba8d6425c48027444754.gif" align="left" > 
 Notice: Twitter has closed basic auth login, you can't login with this test code now. OAuth login will be the next update. 
-<h1>Twitter Update</h1><div class="inline"><a href="{{ logout_url }}">sign out</a></div>
+<h1>Twitter Update<div class="inline"><a href="{{ logout_url }}">sign out</a></div></h1>
 <h3>你好, {{ nickname }} </h3>
           <form action="/update" method="post">
             <div>UserID: <input name="id" type="text" value="{{ nickname }}"></div>
@@ -10,7 +10,7 @@ Notice: Twitter has closed basic auth login, you can't login with this test code
             <div><input type="submit" value="提交"></form> <form class="inline" action="/save" method="post" onsubmit="document.getElementById('msg2').value=document.getElementById('msg1').value;return true;"><input type="submit" name="save" value="保存不提交"><input id="msg2" name="content2" type="hidden" value=""></div>
           </form>
 </div>
-<div id="list_msg"><div id="list_action"><a id="clear_all" href="javascript:void(0);">clear all</a></div>
+<div id="list_msg"><div id="list_action"><a id="clear_all" href="javascript:void(0);">clear all[{{ sum }}]</a></div>
 {% for item in msgs %}
 <p class="entry" id="entry_{{ item.id }}">[{{ item.id }}]<a class="msg" href="javascript:void(0);" id="sn_{{ item.id }}">{{ item.msg|escape }}</a><br><span class="small">{{ item.date }}</span> <a href="javascript:void(0);" class="del" id="del_{{ item.id }}" title="delete">[x]</a></p>
 {% endfor %}

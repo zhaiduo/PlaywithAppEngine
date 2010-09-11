@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*- ＃必须在第一行或者第二行
 import cgi
+import sys
 
 from google.appengine.api import users
 from google.appengine.ext import webapp
@@ -66,10 +67,14 @@ class MainPage(webapp.RequestHandler):
 	  'date': result.date,
 	  'id': result.id,
 	})
+      
+      q = db.GqlQuery("SELECT __key__ FROM TwtMsg")
+      results = q.fetch(500)
 
       template_values = {
             'nickname': user.nickname(),
 	    'msgs': msgs,
+	    'sum' : len(results),
 	    'logout_url' : users.create_logout_url(self.request.uri)
       }
 
@@ -92,6 +97,13 @@ class SaveTWT(webapp.RequestHandler):
   def post(self):
     sys_err = 0
     err_msg = ""
+    
+    q = db.GqlQuery("SELECT __key__ FROM TwtMsg")
+    results = q.fetch(500)
+    if len(results) >= 500:
+      err_msg += "保存消息超过500条.<br>"
+      sys_err=1
+
     form = cgi.FieldStorage()
     if len(form["content2"].value) < 3 or len(form["content2"].value) > 130:
       err_msg += "Messages必须是3-130个字符.<br>"
@@ -153,8 +165,8 @@ class UpdateTWT(webapp.RequestHandler):
         err_msg += "UserID必须是3-20个字符.<br>"
         sys_err=1
       
-      if len(form["passwd"].value) < 6 or len(form["passwd"].value) > 50:
-        err_msg += "Password必须是6-50个字符.<br>"
+      if len(form["passwd"].value) < 3 or len(form["passwd"].value) > 50:
+        err_msg += "Password必须是3-50个字符.<br>"
         sys_err=1
       
       if len(form["content"].value) < 3 or len(form["content"].value) > 130:

@@ -2,8 +2,13 @@
   font-family: Verdana, Helvetica, sans-serif;
   background-color: #DDDDDD;
 }
+img{margin:3px;}
 .inline{display:inline;}
 #list_form{background-color:#efefef;border:1px #ccc solid;padding:12px;float:left;width:600px;}
 #list_msg{background-color:#efefef;border:1px #ccc solid;float:left;width:400px;padding:5px;text-align:left;margin-left:4px;}
 #list_action{text-align:right;}
 .small{font-size:0.8em;}
+h1 a{font-size:10px;}
+h1 a:visited{font-size:10px;}
+#footer{border:0px #ccc solid;font-size:10px;}
+.clear{clear:both;}
